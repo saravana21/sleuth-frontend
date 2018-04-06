@@ -1,0 +1,85 @@
+buildscript {
+    repositories {
+        mavenLocal()
+        maven {
+            url 'http://artifactory.io.comcast.net/plugins-release'
+            credentials {
+                username = "${artifactory_user}"
+                password = "${artifactory_password}"
+            }
+        }
+    }
+    dependencies {
+        classpath("org.jfrog.buildinfo:build-info-extractor-gradle:4.4.12")
+        classpath("org.junit.platform:junit-platform-gradle-plugin:1.0.1")
+        classpath(group: 'org.springframework.boot', name: 'spring-boot-gradle-plugin', version:'1.5.4.RELEASE')
+    }
+}
+
+apply plugin: 'com.jfrog.artifactory'
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: 'maven'
+apply plugin: 'org.junit.platform.gradle.plugin'
+apply plugin: 'org.springframework.boot'
+
+group = 'com.comcast.xsp'
+version = '1.0.0'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+compileJava.options.encoding = 'UTF-8'
+
+jar {
+    version = version
+    manifest{
+        attributes 'Main-Class':'com.comcast.xsp.core.Account'
+    }
+}
+
+dependencies {
+//compile("org.springframework.boot:spring-boot-starter-web:2.0.0.RELEASE")
+compile("org.springframework.cloud:spring-cloud-starter-sleuth:1.3.3.RELEASE")
+compile("org.springframework.cloud:spring-cloud-sleuth-zipkin:1.3.3.RELEASE")
+//compile("org.springframework.cloud:spring-cloud-sleuth-core:1.3.3.RELEASE")
+compile("org.springframework.cloud:spring-cloud-starter-zipkin:1.3.3.RELEASE")
+
+
+    compile("org.springframework.boot:spring-boot-devtools")
+    compile("org.springframework.boot:spring-boot-starter-web")
+    testCompile("junit:junit")
+    testCompile("org.springframework.boot:spring-boot-starter-test")
+
+    testCompile(
+            'org.junit.jupiter:junit-jupiter-api:5.0.1'
+    )
+    testRuntime(
+            'org.junit.jupiter:junit-jupiter-engine:5.0.1',
+            'org.junit.vintage:junit-vintage-engine:4.12.1',
+            'org.junit.platform:junit-platform-launcher:1.0.1',
+            'org.junit.platform:junit-platform-runner:1.0.1'
+    )
+
+}
+artifactory {
+    contextUrl = "${artifactory_contextUrl}"
+    resolve {
+        repository {
+            repoKey = 'libs-all'
+            username = "${artifactory_user}"
+            password = "${artifactory_password}"
+            maven = true
+        }
+    }
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '4.4'
+}
+
+//dependencyManagement{
+//    imports {
+//        mavenBom "org.springframework.cloud:spring-cloud-dependencies:Brixton.BUILD-SNAPSHOT"
+//    }
+//}
